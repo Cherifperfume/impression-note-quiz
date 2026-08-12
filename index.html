@@ -105,6 +105,22 @@
       #innote .primary{width:100%}
     }
   </style>
+  <!-- Meta Pixel Code（夏利夫有限公司_備用's Pixel｜5634445363265191）-->
+  <script>
+  !function(f,b,e,v,n,t,s)
+  {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+  n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+  if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+  n.queue=[];t=b.createElement(e);t.async=!0;
+  t.src=v;s=b.getElementsByTagName(e)[0];
+  s.parentNode.insertBefore(t,s)}(window, document,'script',
+  'https://connect.facebook.net/en_US/fbevents.js');
+  fbq('init', '5634445363265191');
+  fbq('track', 'PageView');
+  </script>
+  <noscript><img height="1" width="1" style="display:none"
+  src="https://www.facebook.com/tr?id=5634445363265191&ev=PageView&noscript=1"/></noscript>
+  <!-- End Meta Pixel Code -->
 </head>
 <body>
 <div id="innote">
@@ -268,7 +284,7 @@
   function show(v){views.forEach(x=>$(x).classList.toggle("active",x===v))}
 
   const INN={
-    start(){step=0;answers=[];show("quiz");this.render()},
+    start(){step=0;answers=[];show("quiz");this.render();if(window.fbq)fbq('trackCustom','QuizStart',{quiz:'ImpressionNote'});},
     render(){
       const q=questions[step];
       $("question").textContent=q.q;
@@ -308,7 +324,12 @@
       $("resultNotes").innerHTML=c.notes.map(n=>`<span>${n}</span>`).join("");
       $("resultPrice").innerHTML=`沙龍香 · 100ml · 淡香精　<s>NT$1,980</s><b>NT$1,680</b>`;
       const link=$("productLink"); link.href=c.url; link.textContent=`收藏 ${c.name}`;
+      link.onclick=function(){ if(window.fbq){
+        fbq('track','Lead',{content_name:c.name,content_category:'ImpressionNote'});
+        fbq('trackCustom','QuizBuyClick',{character:c.name,perfume:c.en,url:c.url});
+      }};
       show("result");
+      if(window.fbq)fbq('trackCustom','QuizComplete',{character:c.name,perfume:c.en,content_name:c.name});
       const card=document.querySelector('#innote .card'); if(card)card.scrollTop=0;
     },
     restart(){this.start()}
