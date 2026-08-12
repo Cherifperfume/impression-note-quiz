@@ -1,0 +1,325 @@
+<!--
+  印象筆記 Impression Note ｜人物原型香水心理測驗
+  ---------------------------------------------------------------
+  要上線前你只需要做「一件事」：把 12 張人物卡片圖 + 封面圖的網址填進下方 CONFIG。
+  圖片必須先上傳到官網(cherif-perfume.com)或圖床，取得完整網址(https://...)後貼進來，
+  不能只放本機檔，否則線上會 404、圖不出來。
+  在你還沒填網址前，畫面會自動顯示「羅馬數字 + 人物名」的塑卡風佔位卡，流程照樣能玩。
+  ---------------------------------------------------------------
+-->
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>印象筆記人物測驗｜你是哪一位？</title>
+  <meta name="description" content="回答 10 題直覺選擇，找出最像你的印象筆記人物，以及一瓶為你而調的香水。" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;500;600;700;900&family=Cormorant+Garamond:wght@500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* 全部包在 #innote 底下並加 !important，避免被 Shopline/官網佈景主題的字體與顏色覆蓋 */
+    #innote{
+      --ink:#e9e3d1;--muted:#a49d86;--paper:#14131a;--card:#1c1a24;--frame:#c9a24b;
+      --gold:#d8b45a;--goldsoft:#b6923f;--line:#3a3646;--cream:#f6f0e2;--deep:#0e0d13;
+      box-sizing:border-box;color:var(--ink) !important;
+      font-family:"Noto Serif TC","Songti TC","Songti SC",serif !important;
+      -webkit-font-smoothing:antialiased;
+    }
+    #innote *{box-sizing:border-box}
+    #innote button,#innote a{font:inherit;color:inherit}
+    #innote .shell{min-height:100svh;display:grid;place-items:center;padding:20px;
+      background:radial-gradient(120% 80% at 50% -10%,#23202e 0%,var(--paper) 55%,var(--deep) 100%)}
+    #innote .card{position:relative;width:min(100%,760px);min-height:min(840px,calc(100svh - 40px));overflow:hidden;
+      border:1px solid #2c2937;border-radius:22px;background:var(--card);
+      box-shadow:0 24px 70px #000000aa, inset 0 0 0 1px #ffffff08}
+    #innote .view{display:none;min-height:inherit}
+    #innote .view.active{display:flex}
+
+    /* ── 封面 ── */
+    #innote .cover{position:relative;flex-direction:column;justify-content:flex-end;
+      padding:clamp(30px,6vw,60px);
+      background:
+        linear-gradient(180deg,#0e0d13cc 0%,#0e0d1366 40%,#0e0d13ee 100%),
+        radial-gradient(80% 60% at 50% 30%,#3a2f52 0%,#17141f 70%);
+      background-size:cover}
+    #innote .cover.hasimg{background:linear-gradient(180deg,#0e0d1399 0%,#0e0d1355 45%,#0e0d13f2 100%),var(--coverimg) center/cover no-repeat}
+    #innote .brand{position:absolute;top:26px;left:0;right:0;text-align:center;
+      font-family:"Cormorant Garamond",serif !important;font-size:30px;letter-spacing:.18em;color:var(--gold);text-shadow:0 2px 18px #000}
+    #innote .brand small{display:block;font-size:11px;letter-spacing:.42em;color:var(--muted);margin-top:4px}
+    #innote .eyebrow{font-family:"Cormorant Garamond",serif !important;font-size:13px;letter-spacing:.32em;text-transform:uppercase;color:var(--gold)}
+    #innote .cover h1{font-size:clamp(32px,6.6vw,58px);line-height:1.28;margin:14px 0 16px;font-weight:700;letter-spacing:.03em;color:var(--cream) !important}
+    #innote .cover p{font-size:16.5px;line-height:1.95;max-width:520px;margin:0 0 30px;color:#d7d0bf !important}
+    #innote .stars{color:var(--gold);letter-spacing:.4em;font-size:13px;margin-bottom:14px;opacity:.9}
+
+    /* ── 按鈕 ── */
+    #innote .primary{display:inline-flex;justify-content:center;align-items:center;min-height:54px;padding:0 30px;border:0;cursor:pointer;
+      border-radius:999px;background:linear-gradient(180deg,var(--gold),var(--goldsoft));color:#20180a !important;font-weight:700;letter-spacing:.04em;
+      text-decoration:none;transition:.2s;box-shadow:0 8px 24px #d8b45a2e}
+    #innote .primary:hover{transform:translateY(-2px);filter:brightness(1.05)}
+    #innote .choice{width:100%;text-align:left;padding:20px 22px;cursor:pointer;transition:.18s;
+      background:#211f2b;border:1px solid var(--line);color:var(--ink) !important;border-radius:15px;font-size:16.5px;line-height:1.6}
+    #innote .choice:hover{border-color:var(--gold);background:#262233;transform:translateY(-1px)}
+    #innote .choice b{display:inline-grid;place-items:center;width:30px;height:30px;margin-right:12px;
+      border:1px solid var(--goldsoft);border-radius:50%;font-family:"Cormorant Garamond",serif !important;font-size:14px;color:var(--gold);vertical-align:middle}
+
+    /* ── 題目 ── */
+    #innote .quiz{flex-direction:column;padding:clamp(26px,5vw,52px)}
+    #innote .topbar{display:flex;justify-content:space-between;align-items:center;
+      font-family:"Cormorant Garamond",serif !important;font-size:14px;letter-spacing:.14em;color:var(--muted)}
+    #innote .progress{height:4px;background:#2b2837;border-radius:9px;margin:14px 0 40px;overflow:hidden}
+    #innote .progress i{display:block;height:100%;width:10%;background:linear-gradient(90deg,var(--goldsoft),var(--gold));transition:.25s}
+    #innote .question{font-size:clamp(23px,4.4vw,36px);font-weight:600;line-height:1.5;margin:0 0 30px;color:var(--cream) !important}
+    #innote .choices{display:grid;gap:13px}
+    #innote .back{margin-top:auto;padding-top:28px;background:none;border:0;color:var(--muted);cursor:pointer;align-self:flex-start;letter-spacing:.06em}
+
+    /* ── 結果（塑卡風） ── */
+    #innote .result{flex-direction:column;align-items:center;padding:clamp(28px,5vw,50px) clamp(22px,5vw,52px) clamp(32px,5vw,52px)}
+    #innote .tarot{position:relative;width:min(330px,80%);aspect-ratio:4/5;margin:4px auto 22px;border-radius:16px;overflow:hidden;
+      border:2px solid var(--frame);box-shadow:0 18px 46px #000000b0, inset 0 0 0 6px #0e0d1355, inset 0 0 0 7px #c9a24b55;
+      background:linear-gradient(160deg,#2c2540,#181521 60%,#0f0d16)}
+    #innote .tarot .cardimg{position:absolute;inset:0;background-size:cover;background-position:center}
+    #innote .tarot .ph{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:space-between;padding:16px;text-align:center}
+    #innote .tarot .ph .rn{font-family:"Cormorant Garamond",serif !important;color:var(--gold);font-size:26px;letter-spacing:.1em}
+    #innote .tarot .ph .glyph{font-size:60px;line-height:1;color:#d8b45a;filter:drop-shadow(0 4px 14px #0008);align-self:center;margin:auto 0}
+    #innote .tarot .ph .nm{font-size:22px;font-weight:700;color:var(--cream)}
+    #innote .tarot .ph .en{font-family:"Cormorant Garamond",serif !important;font-size:12px;letter-spacing:.14em;color:var(--muted)}
+    #innote .rslt-eyebrow{font-family:"Cormorant Garamond",serif !important;font-size:12.5px;letter-spacing:.3em;text-transform:uppercase;color:var(--gold);text-align:center}
+    #innote .result h1{font-size:clamp(30px,6vw,46px);margin:8px 0 2px;font-weight:700;color:var(--cream) !important;text-align:center;letter-spacing:.03em}
+    #innote .en{font-family:"Cormorant Garamond",serif !important;font-size:16px;letter-spacing:.12em;color:var(--gold);text-align:center;margin-bottom:14px}
+    #innote .result-copy{font-size:16px;line-height:1.95;color:#d7d0bf !important;text-align:center;max-width:520px;margin:0 auto}
+    #innote .notes{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:20px 0 8px}
+    #innote .notes span{padding:7px 13px;border:1px solid var(--line);border-radius:999px;font-size:12.5px;color:var(--ink) !important;background:#211f2b}
+    #innote .price{margin:14px 0 4px;color:var(--muted);font-family:"Cormorant Garamond",serif !important;letter-spacing:.06em;font-size:15px;text-align:center}
+    #innote .price s{opacity:.6;margin-right:8px}
+    #innote .price b{color:var(--gold);font-size:19px}
+    #innote .actions{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:20px}
+    #innote .secondary{border:0;background:transparent;color:var(--muted);padding:14px 16px;cursor:pointer;letter-spacing:.06em}
+    #innote .secondary:hover{color:var(--ink)}
+
+    @media(max-width:540px){
+      #innote .shell{padding:0}
+      #innote .card{border:0;border-radius:0;min-height:100svh}
+      #innote .tarot{width:min(260px,64%)}
+      #innote .actions{flex-direction:column;align-items:stretch}
+      #innote .primary{width:100%}
+    }
+  </style>
+</head>
+<body>
+<div id="innote">
+<main class="shell"><section class="card">
+
+  <!-- 封面 -->
+  <div id="cover" class="view cover active">
+    <div class="brand">Impression Note<small>印 象 筆 記</small></div>
+    <div class="eyebrow">Character Scent Quiz</div>
+    <h1>你，是哪一位<br>印象筆記人物？</h1>
+    <div class="stars">✦ ✦ ✦ ✦ ✦ ✦</div>
+    <p>十二個角色，各自帶著一段故事與一瓶香。回答 10 個直覺選擇，翻開最像你的那張牌，遇見為你而調的味道。</p>
+    <div><button class="primary" onclick="INN.start()">翻開我的牌</button></div>
+  </div>
+
+  <!-- 題目 -->
+  <div id="quiz" class="view quiz">
+    <div class="topbar"><span>Impression Note</span><span id="counter">01 / 10</span></div>
+    <div class="progress"><i id="bar"></i></div>
+    <h2 id="question" class="question"></h2>
+    <div id="choices" class="choices"></div>
+    <button id="back" class="back" onclick="INN.back()">← 回到上一題</button>
+  </div>
+
+  <!-- 結果 -->
+  <div id="result" class="view result">
+    <div class="rslt-eyebrow">Your Character</div>
+    <div id="tarot" class="tarot"></div>
+    <h1 id="resultTitle"></h1>
+    <div id="resultEn" class="en"></div>
+    <p id="resultCopy" class="result-copy"></p>
+    <div id="resultNotes" class="notes"></div>
+    <div id="resultPrice" class="price"></div>
+    <div class="actions">
+      <a id="productLink" class="primary" target="_top" rel="noopener">收藏這支香水</a>
+      <button class="secondary" onclick="INN.restart()">重新測一次</button>
+    </div>
+  </div>
+
+</section></main>
+</div>
+
+<script>
+(function(){
+  /* ===================== CONFIG：把 12 張卡片圖 + 封面圖網址填在這裡 ===================== */
+  const CARD_IMG = {
+    darkcrown:"https://img.shoplineapp.com/media/image_clips/6a7c2e35a996f7be24edf8c2/original.jpeg?1786523188=&owner_id=620df8c263e2f000158750f6",
+    lionheart:"https://img.shoplineapp.com/media/image_clips/6a7c2e3c7e2c9ac0402bdc69/original.jpeg?1786523195=&owner_id=620df8c263e2f000158750f6",
+    hunter:"https://img.shoplineapp.com/media/image_clips/6a7c2e452cde38b84cb00db0/original.jpeg?1786523204=&owner_id=620df8c263e2f000158750f6",
+    herald:"https://img.shoplineapp.com/media/image_clips/6a7c2e1f674e87b475d55fe0/original.jpeg?1786523166=&owner_id=620df8c263e2f000158750f6",
+    sage:"https://img.shoplineapp.com/media/image_clips/6a7c2dd8f95ffeaab94aabd3/original.jpg?1786523095=&owner_id=620df8c263e2f000158750f6",
+    witch:"https://img.shoplineapp.com/media/image_clips/6a7c2de358964dc793be21b7/original.jpg?1786523106=&owner_id=620df8c263e2f000158750f6",
+    poet:"https://img.shoplineapp.com/media/image_clips/6a7c2e13b4383bc2d23d7e39/original.jpeg?1786523154=&owner_id=620df8c263e2f000158750f6",
+    lady:"https://img.shoplineapp.com/media/image_clips/6a7c2e2b7a95e8cf4c54e224/original.jpeg?1786523179=&owner_id=620df8c263e2f000158750f6",
+    duke:"https://img.shoplineapp.com/media/image_clips/6a7c2df101884517626d2baf/original.jpeg?1786523121=&owner_id=620df8c263e2f000158750f6",
+    nomad:"https://img.shoplineapp.com/media/image_clips/6a7c2e065b7b9519edd690b9/original.jpeg?1786523142=&owner_id=620df8c263e2f000158750f6",
+    baroness:"https://img.shoplineapp.com/media/image_clips/6a7c2e522cde38b84cb00db6/original.jpeg?1786523217=&owner_id=620df8c263e2f000158750f6",
+    marais:"https://img.shoplineapp.com/media/image_clips/6a7c2e65f57a1b0a609b760e/original.jpeg?1786523237=&owner_id=620df8c263e2f000158750f6"
+  };
+  const COVER_IMG = "https://img.shoplineapp.com/media/image_clips/6a7c2ece5b7b9519edd6911d/original.jpeg?1786523341=&owner_id=620df8c263e2f000158750f6"; // 封面大圖
+  /* =================================================================================== */
+
+  // 12 位人物（順序=羅馬數字 I..XII）
+  const chars=[
+    {id:"darkcrown",rn:"I",glyph:"♚",name:"暗冕騎士",en:"Knight of Dark Crown",
+     copy:"你習慣把責任扛在自己肩上，話不多，卻從不缺席。焚香與焦木在暗處低鳴，是一種沉得住氣的力量。",
+     notes:["焚香","煙草木質","黑玫瑰"],url:"https://www.cherif-perfume.com/product/detail/2509548"},
+    {id:"lionheart",rn:"II",glyph:"⚔",name:"獅心騎士",en:"Knight of Lion Heart",
+     copy:"外表堅定，內裡其實很軟。你守護在乎的人，用的是溫度而不是聲量——像棉花裹著雪松的暖。",
+     notes:["蘭姆酒","岩蘭草","溫暖木質"],url:"https://www.cherif-perfume.com/product/detail/2509537"},
+    {id:"hunter",rn:"III",glyph:"✦",name:"截星獵手",en:"Hunter of Falling Stars",
+     copy:"你安靜卻敏銳，看準了就出手。冷杉與白茶的清冽，是行動派特有的俐落餘味。",
+     notes:["冷杉綠葉","白茶","荔枝"],url:"https://www.cherif-perfume.com/product/detail/2509529"},
+    {id:"herald",rn:"IV",glyph:"☨",name:"淨魂神使",en:"Herald of Pure Souls",
+     copy:"你冷靜、慈悲，帶著一點距離感。乳香與鳶尾像神殿裡的光，讓靠近的人自然安靜下來。",
+     notes:["乳香","鳶尾","白麝香"],url:"https://www.cherif-perfume.com/product/detail/2509520"},
+    {id:"sage",rn:"V",glyph:"❦",name:"古木賢者",en:"Sage of Elderwood",
+     copy:"話不多，但每一句都有重量。沉香與檀木沉在底層，是歲月磨出來的深邃與篤定。",
+     notes:["沉香","檀木","茶葉"],url:"https://www.cherif-perfume.com/product/detail/2412173"},
+    {id:"witch",rn:"VI",glyph:"☾",name:"迷夜女巫",en:"Witch of Midnight",
+     copy:"聰明、傲嬌，刀子嘴豆腐心。白色花朵在夜裡綻放，甜得有心機，也甜得真心。",
+     notes:["橙花","白茉莉","白玫瑰"],url:"https://www.cherif-perfume.com/product/detail/2412131"},
+    {id:"poet",rn:"VII",glyph:"✒",name:"若葉詩人",en:"Poet with Zest",
+     copy:"你敏感、安靜，習慣先觀察再開口。粉紅胡椒與百里香帶著少年感，是清醒又溫柔的綠意。",
+     notes:["粉紅胡椒","百里香","絲柏"],url:"https://www.cherif-perfume.com/product/detail/2138442"},
+    {id:"lady",rn:"VIII",glyph:"❀",name:"琴心女士",en:"Lady of Melody",
+     copy:"優雅而細膩，你的溫柔像一段柔和的旋律。草莓與鈴蘭牽起牡丹玫瑰，甜美卻不喧嘩。",
+     notes:["草莓","鈴蘭","玫瑰牡丹"],url:"https://www.cherif-perfume.com/product/detail/2138440"},
+    {id:"duke",rn:"IX",glyph:"❖",name:"四季公爵",en:"Duke of Seasons",
+     copy:"私下斯文，工作起來俐落幹練。檸檬與四季春茶清爽提神，是理性又體面的雙面魅力。",
+     notes:["檸檬","四季春茶","琴酒"],url:"https://www.cherif-perfume.com/product/detail/1774285"},
+    {id:"nomad",rn:"X",glyph:"✧",name:"波本浪人",en:"Nomad of Bourbon",
+     copy:"你獨立、歷練，不急著跟誰解釋自己。威士忌與焚香在木質裡發酵，是走過路的人才有的味道。",
+     notes:["威士忌","焚香","雪松"],url:"https://www.cherif-perfume.com/product/detail/2049481"},
+    {id:"baroness",rn:"XI",glyph:"☽",name:"滿月女爵",en:"Baroness of Lune",
+     copy:"清冷、優雅，意志卻很堅定。紫丁香與白薄荷像月光下的空氣，通透而有主張。",
+     notes:["紫丁香","白薄荷","梔子"],url:"https://www.cherif-perfume.com/product/detail/2049488"},
+    {id:"marais",rn:"XII",glyph:"❧",name:"瑪黑夫人",en:"Mrs. Marais",
+     copy:"你懂生活、有主見，優雅但從不討好。紅茶與雙重玫瑰交疊，是成熟女人的從容底氣。",
+     notes:["錫蘭紅茶","雙重玫瑰","伯爵茶"],url:"https://www.cherif-perfume.com/product/detail/1774292"}
+  ];
+
+  // 10 題；每個選項 aff = 加分的人物 id；w = 該題權重(選香/選角色題加重)
+  const questions=[
+    {q:"一天之中，最像你的時刻是？",w:1,opts:[
+      {t:"清晨微光，安靜地開始",aff:["herald","baroness","poet"]},
+      {t:"正午時分，效率全開行動",aff:["hunter","duke","lionheart"]},
+      {t:"黃昏微醺，鬆一口氣",aff:["nomad","marais","lady"]},
+      {t:"深夜獨處，思緒最清明",aff:["darkcrown","witch","sage"]}]},
+    {q:"朋友眼中的你，比較像？",w:1,opts:[
+      {t:"可靠、扛得住事的守護者",aff:["lionheart","sage"]},
+      {t:"冷靜、算得準的軍師",aff:["hunter","duke","herald"]},
+      {t:"嘴硬心軟的有趣傢伙",aff:["witch","poet"]},
+      {t:"懂生活、有品味的人",aff:["marais","lady","baroness"]}]},
+    {q:"遇到難題，你的第一反應？",w:1,opts:[
+      {t:"扛下來，自己想辦法解決",aff:["darkcrown","lionheart","nomad"]},
+      {t:"冷靜分析、快速決斷",aff:["hunter","duke"]},
+      {t:"先觀察，再默默出手",aff:["poet","sage"]},
+      {t:"用直覺與魅力化解",aff:["witch","lady","marais"]}]},
+    {q:"哪一種空間最讓你安心？",w:1,opts:[
+      {t:"燭光教堂、靜謐神殿",aff:["herald","sage","darkcrown"]},
+      {t:"深夜酒館、老木書房",aff:["nomad","marais"]},
+      {t:"灑滿花香的午後房間",aff:["lady","baroness","witch"]},
+      {t:"山林溪邊、清新戶外",aff:["hunter","poet","duke"]}]},
+    {q:"挑一種味道，靠近你的氣息：",w:2,opts:[
+      {t:"焚香、煙草、深色木質",aff:["darkcrown","nomad","sage"]},
+      {t:"乳香、鳶尾、清冷礦物感",aff:["herald","baroness"]},
+      {t:"白色花朵、玫瑰、柔麝香",aff:["witch","lady","marais"]},
+      {t:"綠葉、茶香、柑橘草本",aff:["hunter","poet","duke"]}]},
+    {q:"你表達在乎的方式，通常是？",w:1,opts:[
+      {t:"話不多，用行動證明",aff:["lionheart","nomad"]},
+      {t:"嘴上嫌棄，心裡最在意",aff:["witch","poet"]},
+      {t:"溫柔體貼、細膩照顧",aff:["lady","lionheart"]},
+      {t:"保持優雅的距離",aff:["herald","baroness","marais"]}]},
+    {q:"最理想的週末安排？",w:1,opts:[
+      {t:"一個人的長途散步或旅程",aff:["nomad","poet"]},
+      {t:"把家佈置成喜歡的樣子",aff:["marais","lady"]},
+      {t:"讀一本厚書、鑽研興趣",aff:["sage","duke"]},
+      {t:"安靜冥想、獨處充電",aff:["herald","darkcrown","baroness"]}]},
+    {q:"哪一句話最接近你的信念？",w:1,opts:[
+      {t:"扛起責任，才是真正的自由",aff:["darkcrown","lionheart"]},
+      {t:"冷靜，是最強的武器",aff:["hunter","duke","herald"]},
+      {t:"真實，比討喜更重要",aff:["marais","witch","nomad"]},
+      {t:"溫柔，也是一種力量",aff:["lady","sage","baroness"]}]},
+    {q:"你的氣場，比較接近？",w:1,opts:[
+      {t:"暗色、深邃、有重量",aff:["darkcrown","sage","nomad"]},
+      {t:"明亮、俐落、有行動力",aff:["hunter","duke","lionheart"]},
+      {t:"清冷、通透、有距離",aff:["herald","baroness","poet"]},
+      {t:"柔和、細緻、有溫度",aff:["lady","marais","witch"]}]},
+    {q:"如果化身一個角色，你會是？",w:2,opts:[
+      {t:"騎士／守護者",aff:["lionheart","darkcrown"]},
+      {t:"獵手／軍師",aff:["hunter","duke"]},
+      {t:"賢者／神使／詩人",aff:["sage","herald","poet"]},
+      {t:"女巫／女士／夫人／女爵",aff:["witch","lady","marais","baroness"]}]}
+  ];
+
+  const $=id=>document.getElementById(id);
+  const views=["cover","quiz","result"];
+  let step=0, answers=[];
+
+  function show(v){views.forEach(x=>$(x).classList.toggle("active",x===v))}
+
+  const INN={
+    start(){step=0;answers=[];show("quiz");this.render()},
+    render(){
+      const q=questions[step];
+      $("question").textContent=q.q;
+      $("counter").textContent=String(step+1).padStart(2,"0")+" / "+questions.length;
+      $("bar").style.width=((step+1)/questions.length*100)+"%";
+      $("back").style.visibility=step?"visible":"hidden";
+      const L=["A","B","C","D"];
+      $("choices").innerHTML=q.opts.map((o,i)=>
+        `<button class="choice" onclick="INN.pick(${i})"><b>${L[i]}</b>${o.t}</button>`).join("");
+    },
+    pick(i){answers[step]=i; if(step<questions.length-1){step++;this.render()} else this.finish()},
+    back(){if(step){step--;answers.pop();this.render()}},
+    finish(){
+      const score={}; chars.forEach(c=>score[c.id]=0);
+      answers.forEach((ai,qi)=>{
+        const q=questions[qi]; if(ai==null)return;
+        q.opts[ai].aff.forEach(id=>{if(score[id]!=null)score[id]+=q.w});
+      });
+      let bestScore=-1; chars.forEach(c=>{ if(score[c.id]>bestScore)bestScore=score[c.id]; });
+      const tied=chars.filter(c=>score[c.id]===bestScore);
+      // 同分時用作答內容雜湊，在並列者間穩定且均勻地挑一位（避免總是同一位勝出）
+      let h=0; answers.forEach((ai,qi)=>{h=(h*31+ai*7+qi*13)>>>0;});
+      this.paint(tied[h%tied.length]);
+    },
+    paint(c){
+      const t=$("tarot"); const img=CARD_IMG[c.id];
+      if(img){
+        t.innerHTML=`<div class="cardimg" style="background-image:url('${img}')"></div>`;
+      }else{
+        t.innerHTML=`<div class="ph"><div class="rn">${c.rn}</div>`+
+          `<div class="glyph">${c.glyph}</div>`+
+          `<div><div class="nm">${c.name}</div><div class="en">${c.en}</div></div></div>`;
+      }
+      $("resultTitle").textContent=c.name;
+      $("resultEn").textContent=c.en;
+      $("resultCopy").textContent=c.copy;
+      $("resultNotes").innerHTML=c.notes.map(n=>`<span>${n}</span>`).join("");
+      $("resultPrice").innerHTML=`沙龍香 · 100ml · 淡香精　<s>NT$1,980</s><b>NT$1,680</b>`;
+      const link=$("productLink"); link.href=c.url; link.textContent=`收藏 ${c.name}`;
+      show("result");
+      const card=document.querySelector('#innote .card'); if(card)card.scrollTop=0;
+    },
+    restart(){this.start()}
+  };
+  window.INN=INN;
+
+  // 封面圖
+  if(COVER_IMG){
+    const cov=$("cover"); cov.style.setProperty('--coverimg',`url('${COVER_IMG}')`); cov.classList.add('hasimg');
+  }
+})();
+</script>
+</body>
+</html>
