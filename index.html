@@ -121,6 +121,15 @@
   <noscript><img height="1" width="1" style="display:none"
   src="https://www.facebook.com/tr?id=424773881028046&ev=PageView&noscript=1"/></noscript>
   <!-- End Meta Pixel Code -->
+  <!-- Google tag (gtag.js) — 官網 GA4｜G-PV20497WWX -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-PV20497WWX"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-PV20497WWX');
+  </script>
+  <!-- End Google tag -->
 </head>
 <body>
 <div id="innote">
@@ -284,7 +293,9 @@
   function show(v){views.forEach(x=>$(x).classList.toggle("active",x===v))}
 
   const INN={
-    start(){step=0;answers=[];show("quiz");this.render();if(window.fbq)fbq('trackCustom','QuizStart',{quiz:'ImpressionNote'});},
+    start(){step=0;answers=[];show("quiz");this.render();
+      if(window.fbq)fbq('trackCustom','QuizStart',{quiz:'ImpressionNote'});
+      if(window.gtag)gtag('event','quiz_start',{quiz:'ImpressionNote'});},
     render(){
       const q=questions[step];
       $("question").textContent=q.q;
@@ -324,12 +335,16 @@
       $("resultNotes").innerHTML=c.notes.map(n=>`<span>${n}</span>`).join("");
       $("resultPrice").innerHTML=`沙龍香 · 100ml · 淡香精　<s>NT$1,980</s><b>NT$1,680</b>`;
       const link=$("productLink"); link.href=c.url; link.textContent=`收藏 ${c.name}`;
-      link.onclick=function(){ if(window.fbq){
-        fbq('track','Lead',{content_name:c.name,content_category:'ImpressionNote'});
-        fbq('trackCustom','QuizBuyClick',{character:c.name,perfume:c.en,url:c.url});
-      }};
+      link.onclick=function(){
+        if(window.fbq){
+          fbq('track','Lead',{content_name:c.name,content_category:'ImpressionNote'});
+          fbq('trackCustom','QuizBuyClick',{character:c.name,perfume:c.en,url:c.url});
+        }
+        if(window.gtag)gtag('event','buy_click',{character:c.name,perfume:c.en,link_url:c.url});
+      };
       show("result");
       if(window.fbq)fbq('trackCustom','QuizComplete',{character:c.name,perfume:c.en,content_name:c.name});
+      if(window.gtag)gtag('event','quiz_complete',{character:c.name,perfume:c.en});
       const card=document.querySelector('#innote .card'); if(card)card.scrollTop=0;
     },
     restart(){this.start()}
