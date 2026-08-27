@@ -141,7 +141,7 @@
     <div class="eyebrow">Character Scent Quiz</div>
     <h1>你，是哪一位<br>印象筆記人物？</h1>
     <div class="stars">✦ ✦ ✦ ✦ ✦ ✦</div>
-    <p>十二個角色，各自帶著一段故事與一瓶香。回答 10 個直覺選擇，翻開最像你的那張牌，遇見為你而調的味道。</p>
+    <p>十四個角色，各自帶著一段故事與一瓶香。回答 10 個直覺選擇，翻開最像你的那張牌，遇見為你而調的味道。</p>
     <div><button class="primary" onclick="INN.start()">翻開我的牌</button></div>
   </div>
 
@@ -187,7 +187,9 @@
     duke:"https://img.shoplineapp.com/media/image_clips/6a7c2df101884517626d2baf/original.jpeg?1786523121=&owner_id=620df8c263e2f000158750f6",
     nomad:"https://img.shoplineapp.com/media/image_clips/6a7c2e065b7b9519edd690b9/original.jpeg?1786523142=&owner_id=620df8c263e2f000158750f6",
     baroness:"https://img.shoplineapp.com/media/image_clips/6a7c2e522cde38b84cb00db6/original.jpeg?1786523217=&owner_id=620df8c263e2f000158750f6",
-    marais:"https://img.shoplineapp.com/media/image_clips/6a7c2e65f57a1b0a609b760e/original.jpeg?1786523237=&owner_id=620df8c263e2f000158750f6"
+    marais:"https://img.shoplineapp.com/media/image_clips/6a7c2e65f57a1b0a609b760e/original.jpeg?1786523237=&owner_id=620df8c263e2f000158750f6",
+    teamaster:"https://img.shoplineapp.com/media/image_clips/6a8fb314c79f9d37f6ebd995/original.png?1787802386=&owner_id=620df8c263e2f000158750f6",
+    oiran:"https://img.shoplineapp.com/media/image_clips/6a8fb307e773ef7ce8f2d398/original.png?1787802373=&owner_id=620df8c263e2f000158750f6"
   };
   const COVER_IMG = "https://img.shoplineapp.com/media/image_clips/6a7c2ece5b7b9519edd6911d/original.jpeg?1786523341=&owner_id=620df8c263e2f000158750f6"; // 封面大圖
   /* =================================================================================== */
@@ -229,61 +231,67 @@
      notes:["紫丁香","白薄荷","梔子"],url:"https://www.cherif-perfume.com/product/detail/2049488"},
     {id:"marais",rn:"XII",glyph:"❧",name:"瑪黑夫人",en:"Mrs. Marais",
      copy:"你懂生活、有主見，優雅但從不討好。紅茶與雙重玫瑰交疊，是成熟女人的從容底氣。",
-     notes:["錫蘭紅茶","雙重玫瑰","伯爵茶"],url:"https://www.cherif-perfume.com/product/detail/1774292"}
+     notes:["錫蘭紅茶","雙重玫瑰","伯爵茶"],url:"https://www.cherif-perfume.com/product/detail/1774292"},
+    {id:"teamaster",rn:"XIII",glyph:"🍵",name:"玉龍茶師",en:"Essence of Jade",
+     copy:"你對在乎的事固執到近乎龜毛，嘴上嫌棄，卻總把最好的一批默默留給人。乾燥茶葉、木桌與山裡的風，是與茶相伴一生後，留在身上的安靜味道。",
+     notes:["乾燥茶葉","山風薄荷","橡木苔木質"],url:"https://www.cherif-perfume.com/product/detail/2660620"},
+    {id:"oiran",rn:"XIV",glyph:"🌸",name:"落櫻花魁",en:"Bloom of Sakura",
+     copy:"你先被看見的是美，但真正留住人的，是看過人情世故後依然從容的那道目光。玫瑰與牡丹不甜不膩，溫柔裡藏著深度。",
+     notes:["絲絨玫瑰","茉莉牡丹","白麝香琥珀"],url:"https://www.cherif-perfume.com/product/detail/2660619"}
   ];
 
   // 10 題；每個選項 aff = 加分的人物 id；w = 該題權重(選香/選角色題加重)
   const questions=[
     {q:"一天之中，最像你的時刻是？",w:1,opts:[
-      {t:"清晨微光，安靜地開始",aff:["herald","baroness","poet"]},
+      {t:"清晨微光，安靜地開始",aff:["herald","baroness","poet","teamaster"]},
       {t:"正午時分，效率全開行動",aff:["hunter","duke","lionheart"]},
-      {t:"黃昏微醺，鬆一口氣",aff:["nomad","marais","lady"]},
+      {t:"黃昏微醺，鬆一口氣",aff:["nomad","marais","lady","oiran"]},
       {t:"深夜獨處，思緒最清明",aff:["darkcrown","witch","sage"]}]},
     {q:"朋友眼中的你，比較像？",w:1,opts:[
       {t:"可靠、扛得住事的守護者",aff:["lionheart","sage"]},
       {t:"冷靜、算得準的軍師",aff:["hunter","duke","herald"]},
-      {t:"嘴硬心軟的有趣傢伙",aff:["witch","poet"]},
-      {t:"懂生活、有品味的人",aff:["marais","lady","baroness"]}]},
+      {t:"嘴硬心軟的有趣傢伙",aff:["witch","poet","teamaster"]},
+      {t:"懂生活、有品味的人",aff:["marais","lady","baroness","oiran"]}]},
     {q:"遇到難題，你的第一反應？",w:1,opts:[
       {t:"扛下來，自己想辦法解決",aff:["darkcrown","lionheart","nomad"]},
       {t:"冷靜分析、快速決斷",aff:["hunter","duke"]},
-      {t:"先觀察，再默默出手",aff:["poet","sage"]},
-      {t:"用直覺與魅力化解",aff:["witch","lady","marais"]}]},
+      {t:"先觀察，再默默出手",aff:["poet","sage","teamaster"]},
+      {t:"用直覺與魅力化解",aff:["witch","lady","marais","oiran"]}]},
     {q:"哪一種空間最讓你安心？",w:1,opts:[
       {t:"燭光教堂、靜謐神殿",aff:["herald","sage","darkcrown"]},
       {t:"深夜酒館、老木書房",aff:["nomad","marais"]},
-      {t:"灑滿花香的午後房間",aff:["lady","baroness","witch"]},
-      {t:"山林溪邊、清新戶外",aff:["hunter","poet","duke"]}]},
+      {t:"灑滿花香的午後房間",aff:["lady","baroness","witch","oiran"]},
+      {t:"山林溪邊、清新戶外",aff:["hunter","poet","duke","teamaster"]}]},
     {q:"挑一種味道，靠近你的氣息：",w:2,opts:[
       {t:"焚香、煙草、深色木質",aff:["darkcrown","nomad","sage"]},
       {t:"乳香、鳶尾、清冷礦物感",aff:["herald","baroness"]},
-      {t:"白色花朵、玫瑰、柔麝香",aff:["witch","lady","marais"]},
-      {t:"綠葉、茶香、柑橘草本",aff:["hunter","poet","duke"]}]},
+      {t:"白色花朵、玫瑰、柔麝香",aff:["witch","lady","marais","oiran"]},
+      {t:"乾燥茶葉、綠意、木質草本",aff:["hunter","poet","duke","teamaster"]}]},
     {q:"你表達在乎的方式，通常是？",w:1,opts:[
       {t:"話不多，用行動證明",aff:["lionheart","nomad"]},
-      {t:"嘴上嫌棄，心裡最在意",aff:["witch","poet"]},
+      {t:"嘴上嫌棄，心裡最在意",aff:["witch","poet","teamaster"]},
       {t:"溫柔體貼、細膩照顧",aff:["lady","lionheart"]},
-      {t:"保持優雅的距離",aff:["herald","baroness","marais"]}]},
+      {t:"看得懂，卻不急著拆穿",aff:["herald","baroness","marais","oiran"]}]},
     {q:"最理想的週末安排？",w:1,opts:[
       {t:"一個人的長途散步或旅程",aff:["nomad","poet"]},
-      {t:"把家佈置成喜歡的樣子",aff:["marais","lady"]},
-      {t:"讀一本厚書、鑽研興趣",aff:["sage","duke"]},
+      {t:"把家佈置成喜歡的樣子",aff:["marais","lady","oiran"]},
+      {t:"鑽研一件講究的手藝或興趣",aff:["sage","duke","teamaster"]},
       {t:"安靜冥想、獨處充電",aff:["herald","darkcrown","baroness"]}]},
     {q:"哪一句話最接近你的信念？",w:1,opts:[
       {t:"扛起責任，才是真正的自由",aff:["darkcrown","lionheart"]},
       {t:"冷靜，是最強的武器",aff:["hunter","duke","herald"]},
-      {t:"真實，比討喜更重要",aff:["marais","witch","nomad"]},
-      {t:"溫柔，也是一種力量",aff:["lady","sage","baroness"]}]},
+      {t:"做到位，比討喜更重要",aff:["marais","witch","nomad","teamaster"]},
+      {t:"溫柔，也是一種力量",aff:["lady","sage","baroness","oiran"]}]},
     {q:"你的氣場，比較接近？",w:1,opts:[
       {t:"暗色、深邃、有重量",aff:["darkcrown","sage","nomad"]},
       {t:"明亮、俐落、有行動力",aff:["hunter","duke","lionheart"]},
-      {t:"清冷、通透、有距離",aff:["herald","baroness","poet"]},
-      {t:"柔和、細緻、有溫度",aff:["lady","marais","witch"]}]},
+      {t:"安靜、通透、有留白",aff:["herald","baroness","poet","teamaster"]},
+      {t:"柔和、細緻、有溫度",aff:["lady","marais","witch","oiran"]}]},
     {q:"如果化身一個角色，你會是？",w:2,opts:[
       {t:"騎士／守護者",aff:["lionheart","darkcrown"]},
       {t:"獵手／軍師",aff:["hunter","duke"]},
-      {t:"賢者／神使／詩人",aff:["sage","herald","poet"]},
-      {t:"女巫／女士／夫人／女爵",aff:["witch","lady","marais","baroness"]}]}
+      {t:"賢者／神使／詩人／茶師",aff:["sage","herald","poet","teamaster"]},
+      {t:"女巫／女士／夫人／女爵／花魁",aff:["witch","lady","marais","baroness","oiran"]}]}
   ];
 
   const $=id=>document.getElementById(id);
